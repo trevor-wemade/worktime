@@ -321,6 +321,8 @@
                 document.getElementById('sim-result').innerText = minutesToHoursStr(simDiffMinutes);
                 document.getElementById('sim-status').innerText = "남음";
                 document.getElementById('sim-result').className = "font-bold text-blue-600";
+                document.getElementById('sim-status').className = "font-bold text-blue-600";
+
                 document.getElementById('user-tip').innerText = `💡 팁: 이미 목표 시간을 여유롭게 충족하고 계십니다! 남은 ${remainingWorkDays}일 동안은 매일 추가 연장 없이 8시간씩만 근무하셔도 최종적으로 ${minutesToHoursStr(simDiffMinutes)}이 남습니다. 편안한 마음으로 퇴근하세요!`;
             } else {
                 let absDiff = Math.abs(simDiffMinutes);
