@@ -45,10 +45,18 @@
 
             <div id="result-container" class="hidden space-y-6 border-t border-gray-100 pt-6 animate-fade-in">
                 
+                <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
+                    <h3 class="font-bold text-orange-900 mb-2">⚠️ [앞으로 하루 딱 8시간씩만 근무하고 퇴근할 경우]</h3>
+                    <ul class="text-sm text-orange-800 space-y-2">
+                        <li>• 남은 <span id="sim-days" class="font-bold">0</span>일 동안 매일 추가 연장 없이 8시간씩만 근무할 경우, 최종적으로 <span id="sim-result" class="font-bold text-red-600">0시간 00분</span>이 <span id="sim-status">부족</span>하게 됩니다.</li>
+                        <li class="text-xs text-orange-700 bg-white p-2 rounded border border-orange-200" id="user-tip">💡 팁: 남은 기간 동안 파이팅입니다!</li>
+                    </ul>
+                </div>
+                
                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
                     <h3 class="font-bold text-blue-900 mb-2" id="title-month">📊 [XXXX년 XX월 근무 기준]</h3>
                     <ul class="text-sm text-blue-800 space-y-1">
-                        <li>• 총 소정근무일수: <span id="total-work-days" class="font-bold">0</span>일 (주말 및 공휴일 제외)</li>
+                        <li>• 총 소정근무일수: <span id="total-work-days" class="font-bold">0</span>일 (주말 및 공휴일 등 제외)</li>
                         <li>• 총 소정근무시간: <span id="total-work-hours" class="font-bold">0</span>시간 00분</li>
                     </ul>
                 </div>
@@ -57,7 +65,7 @@
                     <h3 class="font-bold text-yellow-900 mb-2">🔍 [기록 누락 평일 확인 (휴가 처리)]</h3>
                     <ul class="text-sm text-yellow-800 space-y-2">
                         <li>• 데이터 중 누락된 평일: <span id="missing-days" class="font-bold text-red-600">없음</span></li>
-                        <li class="text-xs text-yellow-700">💡 위 날짜들은 휴가(연차)를 사용하신 것으로 가정하여 총 누적 시간에 [각 8시간씩] 추가하여 계산했습니다. (무급휴가나 결근인 날이 있다면 말씀해 주세요.)</li>
+                        <li class="text-xs text-yellow-700">💡 위 날짜들은 휴일이거나 휴가(연차)를 사용하신 것으로 가정하여 총 누적 시간에 [각 8시간씩] 추가하여 계산했습니다. </li>
                     </ul>
                 </div>
 
@@ -82,13 +90,6 @@
                     </ul>
                 </div>
 
-                <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
-                    <h3 class="font-bold text-orange-900 mb-2">⚠️ [하루 딱 8시간씩만 근무하고 퇴근할 경우]</h3>
-                    <ul class="text-sm text-orange-800 space-y-2">
-                        <li>• 남은 <span id="sim-days" class="font-bold">0</span>일 동안 매일 추가 연장 없이 8시간씩만 근무할 경우, 최종적으로 <span id="sim-result" class="font-bold text-red-600">0시간 00분</span>이 <span id="sim-status">부족</span>하게 됩니다.</li>
-                        <li class="text-xs text-orange-700 bg-white p-2 rounded border border-orange-200" id="user-tip">💡 팁: 남은 기간 동안 파이팅입니다!</li>
-                    </ul>
-                </div>
 
             </div>
         </div>
