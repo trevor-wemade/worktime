@@ -40,26 +40,54 @@
             </div>
 
             <button onclick="calculateWorkingHours()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-lg transition duration-200 cursor-pointer shadow-md">
-                📊 정밀 계산하기
+                📊 계산하기
             </button>
 
             <div id="result-container" class="hidden space-y-6 border-t border-gray-100 pt-6 animate-fade-in">
-                
-                <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
-                    <h3 class="font-bold text-orange-900 mb-2">⚠️ [앞으로 하루 딱 8시간씩만 근무하고 퇴근할 경우]</h3>
-                    <ul class="text-sm text-orange-800 space-y-2">
-                        <li>• 남은 <span id="sim-days" class="font-bold">0</span>일 동안 매일 추가 연장 없이 8시간씩만 근무할 경우, 최종적으로 <span id="sim-result" class="font-bold text-red-600">0시간 00분</span>이 <span id="sim-status">부족</span>하게 됩니다.</li>
-                        <li class="text-xs text-orange-700 bg-white p-2 rounded border border-orange-200" id="user-tip">💡 팁: 남은 기간 동안 파이팅입니다!</li>
-                    </ul>
-                </div>
-                
+
                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                    <h3 class="font-bold text-blue-900 mb-2" id="title-month">📊 [XXXX년 XX월 근무 기준]</h3>
+                    <h3 class="font-bold text-blue-900 mb-2" id="title-month">📊 [XXXX년 XX월 근무 스케줄]</h3>
                     <ul class="text-sm text-blue-800 space-y-1">
-                        <li>• 총 소정근무일수: <span id="total-work-days" class="font-bold">0</span>일 (주말 및 공휴일 등 제외)</li>
-                        <li>• 총 소정근무시간: <span id="total-work-hours" class="font-bold">0</span>시간 00분</li>
+                        <li>• 소정근무일수: <span id="total-work-days" class="font-bold">0</span>일 </li>
+                        <li>• 소정근무시간: <span id="total-work-hours" class="font-bold">0</span>시간 00분</li>
                     </ul>
                 </div>
+                <!-- 🎯 핵심 결과 시뮬레이션 카드 -->
+                <div class="bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100/60 border-2 border-orange-300 p-5 rounded-2xl shadow-md space-y-4">
+                    <div class="flex items-center justify-between border-b border-orange-200/80 pb-2.5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">🎯</span>
+                            <h3 class="font-extrabold text-orange-950 text-base">최종 예상 결과 (하루 8시간 근무 시)</h3>
+                        </div>
+                        <span class="text-[11px] font-bold px-2.5 py-1 bg-orange-200/70 text-orange-800 rounded-full">시뮬레이션</span>
+                    </div>
+                
+                    <!-- 핵심 수치 강조 박스 -->
+                    <div class="bg-white/90 backdrop-blur p-4 rounded-xl border border-orange-200 shadow-inner text-center">
+                        <p class="text-xs text-gray-500 font-medium mb-1">
+                            남은 <span id="sim-days" class="font-bold text-gray-800">0</span>일 동안 추가 연장 없이 8시간씩 일하면?
+                        </p>
+                        <div class="text-2xl font-black text-gray-900 flex items-center justify-center gap-1.5 my-1">
+                            <span id="sim-result" class="text-3xl text-red-600 font-extrabold">0시간 00분</span>
+                            <span id="sim-status" class="text-xl text-red-600 font-bold">부족</span>
+                        </div>
+                    </div>
+                
+                    <!-- 팁 안내 -->
+                    <div class="text-xs text-orange-800 bg-white/70 p-2.5 rounded-lg border border-orange-200/60 flex items-center gap-2" id="user-tip">
+                        <span>💡</span>
+                        <span>팁: 남은 기간 동안 파이팅입니다!</span>
+                    </div>
+                </div>
+                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg">
+                    <h3 class="font-bold text-purple-900 mb-2">⏳ [남은 기간 근무 가이드]</h3>
+                    <ul class="text-sm text-purple-800 space-y-1">
+                        <li>• 남은 소정근무일수: <span id="rem-days" class="font-bold">0</span>일 (오늘 이후 주말/공휴일 제외 평일)</li>
+                        <li>• 목표 달성을 위해 남은 총 시간: <span id="rem-hours" class="font-bold text-purple-700">0시간 00분</span></li>
+                        <li>• 남은 일수 동안의 하루 평균 필수 근무 시간: <span id="avg-daily-req" class="font-bold text-purple-900">하루 0시간 00분</span></li>
+                    </ul>
+                </div>
+
 
                 <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
                     <h3 class="font-bold text-yellow-900 mb-2">🔍 [기록 누락 평일 확인 (휴가 처리)]</h3>
@@ -73,23 +101,14 @@
                     <h3 class="font-bold text-green-900 mb-2">✅ [현재까지의 누적 근무 현황]</h3>
                     <ul class="text-sm text-green-800 space-y-1">
                         <li>• 실제 근무 누적 시간: <span id="actual-hours" class="font-bold">0시간 00분</span></li>
-                        <li>• 휴가 인정 시간: <span id="vacation-hours" class="font-bold">0시간 00분</span></li>
+                        <li>• 기록 누락으로 보충된 시간(휴가 or 공휴일): <span id="vacation-hours" class="font-bold">0시간 00분</span></li>
                         <li class="mt-1 text-base font-semibold text-green-900">
-                            • 🔥 최종 인정 누적 시간: <span id="final-hours" class="font-bold text-blue-600">0시간 00분</span> 
+                            • 🔥 최종 누적 시간: <span id="final-hours" class="font-bold text-blue-600">0시간 00분</span> 
                             <span id="final-hours-note" class="text-xs font-normal text-gray-500">(오늘 18:30 퇴근 가정 포함)</span>
                         </li>
                     </ul>
                 </div>
-
-                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg">
-                    <h3 class="font-bold text-purple-900 mb-2">⏳ [남은 기간 근무 가이드]</h3>
-                    <ul class="text-sm text-purple-800 space-y-1">
-                        <li>• 남은 소정근무일수: <span id="rem-days" class="font-bold">0</span>일 (오늘 이후 주말/공휴일 제외 평일)</li>
-                        <li>• 목표 달성을 위해 남은 총 시간: <span id="rem-hours" class="font-bold text-purple-700">0시간 00분</span></li>
-                        <li>• 남은 일수 동안의 하루 평균 필수 근무 시간: <span id="avg-daily-req" class="font-bold text-purple-900">하루 0시간 00분</span></li>
-                    </ul>
-                </div>
-
+                
 
             </div>
         </div>
