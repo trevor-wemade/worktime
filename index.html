@@ -4,134 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>스마트 근무시간 계산기</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; }
-        /* 숫자 증감 화살표 숨기기 */
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen py-10 px-4">
 
     <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-7 text-white text-center">
-            <h1 class="text-xl font-bold mb-1">📊 스마트 근무시간 계산기</h1>
-            <p class="text-blue-100 text-xs">그룹웨어 미퇴근 텍스트 완벽 파싱 및 휴가시간 자동 보정</p>
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-8 text-white text-center">
+            <h1 class="text-2xl font-bold mb-2">📊 스마트 근무시간 계산기</h1>
+            <p class="text-blue-100 text-sm">그룹웨어 특유의 미퇴근 포맷까지 완벽하게 파싱하여 정밀 계산합니다.</p>
         </div>
 
-        <div class="p-5 space-y-4">
-            <!-- 공휴일 및 퇴근 가정 시간 설정 -->
-            <div class="grid grid-cols-2 gap-3 bg-gray-100 p-3 rounded-lg border border-gray-200">
+        <div class="p-6 space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-100 p-4 rounded-xl border border-gray-200">
                 <div>
-                    <label class="block text-gray-700 font-bold text-[11px] mb-1" for="custom-holidays">🏢 회사 지정 공휴일 (쉼표 구분)</label>
-                    <input type="text" id="custom-holidays" class="w-full p-2 bg-white border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 outline-none" placeholder="예: 5/1, 5/22">
+                    <label class="block text-gray-700 font-semibold text-sm mb-1" for="custom-holidays">🏢 회사 지정 공휴일 설정</label>
+                    <p class="text-xs text-gray-500 mb-1.5">창립기념일 등 소정근무 제외 날짜 (쉼표 구분)</p>
+                    <input type="text" id="custom-holidays" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                           placeholder="예: 5/1, 5/22">
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-bold text-[11px] mb-1" for="assumed-exit-time">⏰ 오늘 퇴근 가정 시간</label>
-                    <input type="text" id="assumed-exit-time" class="w-full p-2 bg-white border border-gray-300 rounded text-xs font-bold text-blue-700 focus:ring-1 focus:ring-blue-500 outline-none" value="18:30" placeholder="예: 18:30">
+                    <label class="block text-gray-700 font-semibold text-sm mb-1" for="assumed-exit-time">⏰ 오늘 퇴근 가정 시간</label>
+                    <p class="text-xs text-gray-500 mb-1.5">미퇴근 기록(오늘)에 적용할 퇴근 시간</p>
+                    <input type="text" id="assumed-exit-time" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                           value="18:30" placeholder="예: 18:30">
                 </div>
             </div>
 
-            <!-- 🏖️ 초소형 휴가 입력 바 -->
-            <div class="flex items-center justify-between bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
-                <span class="font-bold text-slate-700 text-xs flex items-center gap-1.5">
-                    <span>🏖️</span> 이번 달 휴가 인정
-                </span>
-                
-                <div class="flex items-center gap-2">
-                    <!-- 반반차 -->
-                    <div class="flex items-center gap-1 text-[11px] font-medium text-slate-600">
-                        반반차(2h)
-                        <div class="flex items-center border border-slate-300 rounded bg-white h-6">
-                            <button type="button" onclick="adjustCount('count-quarter', -1)" class="w-5 hover:bg-slate-100 font-bold text-slate-500">-</button>
-                            <input type="number" id="count-quarter" min="0" value="0" class="w-6 text-center text-xs font-bold border-x border-slate-200 outline-none p-0 text-slate-800">
-                            <button type="button" onclick="adjustCount('count-quarter', 1)" class="w-5 hover:bg-slate-100 font-bold text-slate-500">+</button>
-                        </div>
-                    </div>
-                    <!-- 반차 -->
-                    <div class="flex items-center gap-1 text-[11px] font-medium text-slate-600 ml-1">
-                        반차(4h)
-                        <div class="flex items-center border border-slate-300 rounded bg-white h-6">
-                            <button type="button" onclick="adjustCount('count-half', -1)" class="w-5 hover:bg-slate-100 font-bold text-slate-500">-</button>
-                            <input type="number" id="count-half" min="0" value="0" class="w-6 text-center text-xs font-bold border-x border-slate-200 outline-none p-0 text-slate-800">
-                            <button type="button" onclick="adjustCount('count-half', 1)" class="w-5 hover:bg-slate-100 font-bold text-slate-500">+</button>
-                        </div>
-                    </div>
-                    <!-- 연차 -->
-                    <div class="flex items-center gap-1 text-[11px] font-medium text-slate-600 ml-1">
-                        연차(8h)
-                        <div class="flex items-center border border-slate-300 rounded bg-white h-6">
-                            <button type="button" onclick="adjustCount('count-full', -1)" class="w-5 hover:bg-slate-100 font-bold text-slate-500">-</button>
-                            <input type="number" id="count-full" min="0" value="0" class="w-6 text-center text-xs font-bold border-x border-slate-200 outline-none p-0 text-slate-800">
-                            <button type="button" onclick="adjustCount('count-full', 1)" class="w-5 hover:bg-slate-100 font-bold text-slate-500">+</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 데이터 입력 영역 -->
             <div>
-                <textarea id="raw-data" class="w-full h-40 p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 outline-none resize-none text-[13px] leading-relaxed font-mono placeholder-gray-400" 
-                          placeholder="📅 그룹웨어 근무 기록 데이터를 복사해서 그대로 붙여넣으세요. (미래 날짜의 빈칸이 포함되어 있어도 자동으로 무시합니다.)"></textarea>
+                <label class="block text-gray-700 font-semibold mb-2" for="raw-data">📅 근무 기록 데이터 붙여넣기</label>
+                <textarea id="raw-data" class="w-full h-48 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm font-mono placeholder-gray-400" 
+                          placeholder="근무 데이터를 그대로 복사 붙여넣기 하세요."></textarea>
             </div>
 
-            <button type="button" onclick="calculateWorkingHours()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-lg transition duration-200 cursor-pointer shadow-sm text-sm">
-                📊 계산하기
+            <button onclick="calculateWorkingHours()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-lg transition duration-200 cursor-pointer shadow-md">
+                📊 정밀 계산하기
             </button>
 
-            <!-- 결과 컨테이너 -->
-            <div id="result-container" class="hidden space-y-4 border-t border-gray-100 pt-5">
-
-                <!-- 🎯 최종 시뮬레이션 카드 -->
-                <div class="bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100/60 border border-orange-200 p-4 rounded-xl shadow-sm">
-                    <div class="flex items-center justify-between border-b border-orange-200/80 pb-2 mb-3">
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-base">🎯</span>
-                            <h3 class="font-extrabold text-orange-950 text-sm">최종 예상 결과 (남은 평일 8시간 근무 시)</h3>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white/90 backdrop-blur p-3 rounded-lg border border-orange-200 text-center mb-2">
-                        <p class="text-xs text-gray-500 font-medium mb-1">
-                            남은 <span id="sim-days" class="font-bold text-gray-800">0</span>일 동안 연장 없이 8시간씩 일하면?
-                        </p>
-                        <div class="text-2xl font-black flex items-center justify-center gap-1.5">
-                            <span id="sim-result" class="text-2xl text-red-600 font-extrabold">0시간 00분</span>
-                            <span id="sim-status" class="text-base text-red-600 font-bold">부족</span>
-                        </div>
-                    </div>
-                    
-                    <div class="text-[11px] text-orange-800 bg-white/70 p-2 rounded border border-orange-100 flex items-center gap-1" id="user-tip">
-                        <span>💡</span>
-                        <span>팁: 남은 기간 동안 파이팅입니다!</span>
-                    </div>
-                </div>
+            <div id="result-container" class="hidden space-y-6 border-t border-gray-100 pt-6 animate-fade-in">
                 
-                <div class="grid grid-cols-2 gap-3">
-                    <!-- 남은 가이드 -->
-                    <div class="bg-purple-50 border-l-4 border-purple-500 p-3 rounded-r-lg flex flex-col justify-center">
-                        <h3 class="font-bold text-purple-900 text-xs mb-1.5">⏳ [남은 기간 가이드]</h3>
-                        <ul class="text-[11px] text-purple-800 space-y-1">
-                            <li>• 잔여 근무일: <span id="rem-days" class="font-bold text-sm">0</span>일</li>
-                            <li>• 목표까지 남은 시간: <span id="rem-hours" class="font-bold text-purple-700 text-sm">0h 00m</span></li>
-                            <li>• 하루 필수 근무: <span id="avg-daily-req" class="font-bold text-purple-900 text-sm">0h 00m</span></li>
-                        </ul>
-                    </div>
-
-                    <!-- 누적 현황 -->
-                    <div class="bg-green-50 border-l-4 border-green-500 p-3 rounded-r-lg flex flex-col justify-center">
-                        <h3 class="font-bold text-green-900 text-xs mb-1.5">✅ [현재까지 누적 현황]</h3>
-                        <ul class="text-[11px] text-green-800 space-y-1">
-                            <li>• 순수 출퇴근 합산: <span id="actual-hours" class="font-bold">0h 00m</span></li>
-                            <li>• 휴가 인정 시간: <span id="vacation-hours" class="font-bold text-orange-600">0h 00m</span></li>
-                            <li class="mt-1 font-bold text-green-900">
-                                • 👑 총 인정 시간: <span id="final-hours" class="font-bold text-blue-600 text-[13px]">0h 00m</span> 
-                            </li>
-                        </ul>
-                    </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h3 class="font-bold text-blue-900 mb-2" id="title-month">📊 [XXXX년 XX월 근무 기준]</h3>
+                    <ul class="text-sm text-blue-800 space-y-1">
+                        <li>• 총 소정근무일수: <span id="total-work-days" class="font-bold">0</span>일 (주말 및 공휴일 제외)</li>
+                        <li>• 총 소정근무시간: <span id="total-work-hours" class="font-bold">0</span>시간 00분</li>
+                    </ul>
                 </div>
-                
+
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+                    <h3 class="font-bold text-yellow-900 mb-2">🔍 [기록 누락 평일 확인 (휴가 처리)]</h3>
+                    <ul class="text-sm text-yellow-800 space-y-2">
+                        <li>• 데이터 중 누락된 평일: <span id="missing-days" class="font-bold text-red-600">없음</span></li>
+                        <li class="text-xs text-yellow-700">💡 위 날짜들은 휴가(연차)를 사용하신 것으로 가정하여 총 누적 시간에 [각 8시간씩] 추가하여 계산했습니다. (무급휴가나 결근인 날이 있다면 말씀해 주세요.)</li>
+                    </ul>
+                </div>
+
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+                    <h3 class="font-bold text-green-900 mb-2">✅ [현재까지의 누적 근무 현황]</h3>
+                    <ul class="text-sm text-green-800 space-y-1">
+                        <li>• 실제 근무 누적 시간: <span id="actual-hours" class="font-bold">0시간 00분</span></li>
+                        <li>• 휴가 인정 시간: <span id="vacation-hours" class="font-bold">0시간 00분</span></li>
+                        <li class="mt-1 text-base font-semibold text-green-900">
+                            • 🔥 최종 인정 누적 시간: <span id="final-hours" class="font-bold text-blue-600">0시간 00분</span> 
+                            <span id="final-hours-note" class="text-xs font-normal text-gray-500">(오늘 18:30 퇴근 가정 포함)</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg">
+                    <h3 class="font-bold text-purple-900 mb-2">⏳ [남은 기간 근무 가이드]</h3>
+                    <ul class="text-sm text-purple-800 space-y-1">
+                        <li>• 남은 소정근무일수: <span id="rem-days" class="font-bold">0</span>일 (오늘 이후 주말/공휴일 제외 평일)</li>
+                        <li>• 목표 달성을 위해 남은 총 시간: <span id="rem-hours" class="font-bold text-purple-700">0시간 00분</span></li>
+                        <li>• 남은 일수 동안의 하루 평균 필수 근무 시간: <span id="avg-daily-req" class="font-bold text-purple-900">하루 0시간 00분</span></li>
+                    </ul>
+                </div>
+
+                <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
+                    <h3 class="font-bold text-orange-900 mb-2">⚠️ [하루 딱 8시간씩만 근무하고 퇴근할 경우]</h3>
+                    <ul class="text-sm text-orange-800 space-y-2">
+                        <li>• 남은 <span id="sim-days" class="font-bold">0</span>일 동안 매일 추가 연장 없이 8시간씩만 근무할 경우, 최종적으로 <span id="sim-result" class="font-bold text-red-600">0시간 00분</span>이 <span id="sim-status">부족</span>하게 됩니다.</li>
+                        <li class="text-xs text-orange-700 bg-white p-2 rounded border border-orange-200" id="user-tip">💡 팁: 남은 기간 동안 파이팅입니다!</li>
+                    </ul>
+                </div>
+
             </div>
         </div>
     </div>
@@ -143,18 +101,10 @@
             "2026-09-25", "2026-09-26", "2026-10-03", "2026-10-05", "2026-10-09", "2026-12-25"
         ];
 
-        function adjustCount(elementId, delta) {
-            const input = document.getElementById(elementId);
-            if (!input) return;
-            let current = parseInt(input.value, 10) || 0;
-            current = Math.max(0, current + delta);
-            input.value = current;
-        }
-
         function calculateWorkingHours() {
             const rawText = document.getElementById('raw-data').value.trim();
             if (!rawText) {
-                alert("근무 기록 데이터를 붙여넣어 주세요.");
+                alert("근무 기록 데이터를 입력해 주세요.");
                 return;
             }
 
@@ -164,149 +114,201 @@
                 return;
             }
 
-            // 사용자가 입력한 휴가 개수를 '분(minutes)'으로 환산
-            const countFull = parseInt(document.getElementById('count-full').value, 10) || 0;
-            const countHalf = parseInt(document.getElementById('count-half').value, 10) || 0;
-            const countQuarter = parseInt(document.getElementById('count-quarter').value, 10) || 0;
-            const manualVacationMinutes = (countFull * 8 * 60) + (countHalf * 4 * 60) + (countQuarter * 2 * 60);
-
             const lines = rawText.split('\n');
             let parsedRecords = [];
+            let detectedYear = 2026; 
+            let detectedMonth = null;
 
-            // 연도 추출
-            const textYearMatch = rawText.match(/202\d/);
-            let detectedYear = textYearMatch ? parseInt(textYearMatch[0], 10) : new Date().getFullYear();
-
-            // 파싱
+            // 1. 데이터 파싱
             lines.forEach((line) => {
                 if (!line.trim()) return;
-                const dateMatch = line.match(/(\d{1,2})[-/.](\d{1,2})/); 
-                const timeMatches = line.match(/(\d{2}:\d{2})/g); 
+                
+                const dateMatch = line.match(/(\d{1,2})[-/](\d{1,2})/); // 월/일 추출
+                const timeMatches = line.match(/(\d{2}:\d{2})/g); // 시간들 추출
 
                 if (dateMatch) {
-                    let m = parseInt(dateMatch[1], 10);
-                    let d = parseInt(dateMatch[2], 10);
-                    let clockIn = null, clockOut = null;
+                    let m = parseInt(dateMatch[1]);
+                    let d = parseInt(dateMatch[2]);
+                    if (!detectedMonth) detectedMonth = m; 
 
+                    let clockIn = null;
+                    let clockOut = null;
+
+                    // ★ [그룹웨어 특화 파싱 로직 보완]
                     if (timeMatches) {
-                        if (timeMatches.length >= 4) { clockIn = timeMatches[0]; clockOut = timeMatches[1]; }
-                        else if (timeMatches.length === 3) { clockIn = timeMatches[0]; clockOut = assumedExitTime; }
-                        else if (timeMatches.length === 2) { clockIn = timeMatches[0]; clockOut = timeMatches[1]; }
-                        else if (timeMatches.length === 1) { clockIn = timeMatches[0]; clockOut = assumedExitTime; }
+                        if (timeMatches.length >= 4) {
+                            // 정상 출퇴근 완료 처리된 날 (실제출근, 실제퇴근, 소정출근, 소정퇴근)
+                            clockIn = timeMatches[0];
+                            clockOut = timeMatches[1];
+                        } else if (timeMatches.length === 3) {
+                            // ★ 오늘처럼 미퇴근 상태인 날 (실제출근, 소정출근, 소정퇴근)
+                            clockIn = timeMatches[0];
+                            clockOut = assumedExitTime; // 사용자가 설정한 가정 시간 대입
+                        } else if (timeMatches.length === 2) {
+                            clockIn = timeMatches[0];
+                            clockOut = timeMatches[1];
+                        } else if (timeMatches.length === 1) {
+                            clockIn = timeMatches[0];
+                            clockOut = assumedExitTime;
+                        }
                     }
-                    parsedRecords.push({ month: m, day: d, clockIn, clockOut });
+
+                    parsedRecords.push({
+                        dateStr: `${detectedYear}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,
+                        month: m,
+                        day: d,
+                        clockIn,
+                        clockOut
+                    });
                 }
             });
 
-            if (parsedRecords.length === 0) {
-                alert("유효한 데이터를 찾을 수 없습니다.");
+            if (parsedRecords.length === 0 || !detectedMonth) {
+                alert("올바른 날짜 포맷을 찾을 수 없습니다.");
                 return;
             }
 
-            // 타겟 월(Month) 찾기
-            let monthCounts = {};
-            parsedRecords.forEach(r => { monthCounts[r.month] = (monthCounts[r.month] || 0) + 1; });
-            let detectedMonth = parseInt(Object.keys(monthCounts).reduce((a, b) => monthCounts[a] > monthCounts[b] ? a : b), 10);
-            parsedRecords = parsedRecords.filter(r => r.month === detectedMonth);
-
-            // 공휴일 설정
+            // 1-2. 커스텀 회사 공휴일 파싱
             const customInput = document.getElementById('custom-holidays').value.trim();
             let customHolidays = [];
             if (customInput) {
                 customInput.split(',').forEach(item => {
-                    const match = item.trim().match(/(\d{1,2})[-/.](\d{1,2})/);
-                    if (match) customHolidays.push(`${detectedYear}-${String(match[1]).padStart(2, '0')}-${String(match[2]).padStart(2, '0')}`);
+                    const match = item.trim().match(/(\d{1,2})[-/](\d{1,2})/);
+                    if (match) {
+                        let cm = String(match[1]).padStart(2, '0');
+                        let cd = String(match[2]).padStart(2, '0');
+                        customHolidays.push(`${detectedYear}-${cm}-${cd}`);
+                    }
                 });
             }
             const activeHolidays = [...HOLIDAYS_2026, ...customHolidays];
 
-            // 1. 해당 월 전체 소정근로일수 계산
+            // 2. 해당 월의 총 소정근무일수 계산
             let totalRequiredDays = 0;
             let totalDaysInMonth = new Date(detectedYear, detectedMonth, 0).getDate();
+            
             for (let d = 1; d <= totalDaysInMonth; d++) {
-                let dStr = `${detectedYear}-${String(detectedMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                let dObj = new Date(detectedYear, detectedMonth - 1, d);
-                if (dObj.getDay() !== 0 && dObj.getDay() !== 6 && !activeHolidays.includes(dStr)) {
+                let dateStr = `${detectedYear}-${String(detectedMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                let dateObj = new Date(dateStr);
+                let dayOfWeek = dateObj.getDay(); 
+                
+                if (dayOfWeek !== 0 && dayOfWeek !== 6 && !activeHolidays.includes(dateStr)) {
                     totalRequiredDays++;
                 }
             }
             let totalRequiredMinutes = totalRequiredDays * 8 * 60;
 
-            // 2. 실근무시간 산출 (휴게시간 공제)
+            // 3. 누락 평일 자동 감지
+            let uniqueDatesInRecord = [...new Set(parsedRecords.map(r => r.dateStr))];
+            uniqueDatesInRecord.sort();
+            
+            let firstDate = new Date(detectedYear, detectedMonth - 1, 1); 
+            let lastDate = new Date(uniqueDatesInRecord[uniqueDatesInRecord.length - 1]);
+
+            let missingDaysArr = [];
+            let currentDate = new Date(firstDate);
+
+            while (currentDate <= lastDate) {
+                let yyyy = currentDate.getFullYear();
+                let mm = String(currentDate.getMonth() + 1).padStart(2, '0');
+                let dd = String(currentDate.getDate()).padStart(2, '0');
+                let cStr = `${yyyy}-${mm}-${dd}`;
+
+                let dayOfWeek = currentDate.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6 && !activeHolidays.includes(cStr)) {
+                    if (!uniqueDatesInRecord.includes(cStr)) {
+                        missingDaysArr.push(`${parseInt(mm)}/${parseInt(dd)}`);
+                    }
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            // 4. 근무시간 및 휴게시간 제외 계산
             let totalActualMinutes = 0;
             parsedRecords.forEach(r => {
                 if (!r.clockIn || !r.clockOut) return;
+
                 let inMin = timeToMinutes(r.clockIn);
                 let outMin = timeToMinutes(r.clockOut);
                 if (outMin <= inMin) return; 
 
                 let netMinutes = outMin - inMin;
-                // 점심시간 12:30~13:30
-                let lunchOverlap = Math.max(0, Math.min(outMin, 13 * 60 + 30) - Math.max(inMin, 12 * 60 + 30));
+
+                let lunchStart = 12 * 60 + 30;
+                let lunchEnd = 13 * 60 + 30;
+                let lunchOverlap = Math.max(0, Math.min(outMin, lunchEnd) - Math.max(inMin, lunchStart));
                 netMinutes -= lunchOverlap;
-                // 저녁시간 18:30~19:30
-                let dinnerOverlap = Math.max(0, Math.min(outMin, 19 * 60 + 30) - Math.max(inMin, 18 * 60 + 30));
+
+                let dinnerStart = 18 * 60 + 30;
+                let dinnerEnd = 19 * 60 + 30;
+                let dinnerOverlap = Math.max(0, Math.min(outMin, dinnerEnd) - Math.max(inMin, dinnerStart));
                 netMinutes -= dinnerOverlap;
 
                 totalActualMinutes += netMinutes;
             });
 
-            // 🌟 [핵심 오류 수정] 오늘 날짜를 기준으로 지나간 평일 수 계산
-            // 미래 날짜의 빈칸 데이터가 남은 근무일수를 깎아먹지 못하도록 완벽 차단!
-            let todayObj = new Date();
-            let isCurrentMonth = (detectedYear === todayObj.getFullYear() && detectedMonth === (todayObj.getMonth() + 1));
-            
-            // 현재 달이면 오늘까지만, 과거 달이면 그 달의 마지막 날까지만 카운트
-            let limitDay = isCurrentMonth ? todayObj.getDate() : totalDaysInMonth;
+            let vacationMinutes = missingDaysArr.length * 8 * 60;
+            let finalAcceptedMinutes = totalActualMinutes + vacationMinutes;
 
-            let passedWorkDaysCount = 0;
-            for (let d = 1; d <= limitDay; d++) {
-                let dStr = `${detectedYear}-${String(detectedMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                let dObj = new Date(detectedYear, detectedMonth - 1, d);
-                if (dObj.getDay() !== 0 && dObj.getDay() !== 6 && !activeHolidays.includes(dStr)) {
-                    passedWorkDaysCount++;
-                }
-            }
+            // 5. 남은 기간 근무 가이드 계산
+            let validRecordedDaysCount = uniqueDatesInRecord.filter(dStr => {
+                let dObj = new Date(dStr);
+                let dw = dObj.getDay();
+                return dw !== 0 && dw !== 6 && !activeHolidays.includes(dStr);
+            }).length;
 
-            // 남은 일수 = 전체일수 - 지나간평일수 (이제 절대 틀어지지 않습니다)
-            let remainingWorkDays = Math.max(0, totalRequiredDays - passedWorkDaysCount);
+            let passedWorkDaysCount = validRecordedDaysCount + missingDaysArr.length;
+            let remainingWorkDays = totalRequiredDays - passedWorkDaysCount;
+            if (remainingWorkDays < 0) remainingWorkDays = 0;
 
-            // 최종 인정 시간 = 실제 출퇴근 시간 + 사용자가 UI에 추가한 휴가 시간
-            let finalAcceptedMinutes = totalActualMinutes + manualVacationMinutes;
-            
-            let remainingMinutes = Math.max(0, totalRequiredMinutes - finalAcceptedMinutes);
+            let remainingMinutes = totalRequiredMinutes - finalAcceptedMinutes;
+            if (remainingMinutes < 0) remainingMinutes = 0;
+
             let avgDailyReqMinutes = remainingWorkDays > 0 ? Math.ceil(remainingMinutes / remainingWorkDays) : 0;
 
-            // 시뮬레이션 계산
+            // 6. 하루 8시간 근무 시 시뮬레이션
             let simFutureMinutes = remainingWorkDays * 8 * 60;
             let simFinalTotalMinutes = finalAcceptedMinutes + simFutureMinutes; 
             let simDiffMinutes = simFinalTotalMinutes - totalRequiredMinutes;
 
-            // UI 화면 적용
+            // --- UI 출력 ---
+            document.getElementById('title-month').innerText = `📊 [2026년 ${detectedMonth}월 근무 기준]`;
+            document.getElementById('total-work-days').innerText = totalRequiredDays;
+            document.getElementById('total-work-hours').innerText = totalRequiredDays * 8;
+
+            if (missingDaysArr.length > 0) {
+                document.getElementById('missing-days').innerText = missingDaysArr.join(', ');
+                document.getElementById('missing-days').className = "font-bold text-red-600";
+            } else {
+                document.getElementById('missing-days').innerText = "없음";
+                document.getElementById('missing-days').className = "font-bold text-gray-600";
+            }
+
             document.getElementById('actual-hours').innerText = minutesToHoursStr(totalActualMinutes);
-            document.getElementById('vacation-hours').innerText = minutesToHoursStr(manualVacationMinutes);
+            document.getElementById('vacation-hours').innerText = minutesToHoursStr(vacationMinutes);
             document.getElementById('final-hours').innerText = minutesToHoursStr(finalAcceptedMinutes);
+            
+            document.getElementById('final-hours-note').innerText = `(오늘 ${assumedExitTime} 퇴근 가정 포함)`;
 
             document.getElementById('rem-days').innerText = remainingWorkDays;
             document.getElementById('rem-hours').innerText = minutesToHoursStr(remainingMinutes);
-            document.getElementById('avg-daily-req').innerText = minutesToHoursStr(avgDailyReqMinutes);
+            document.getElementById('avg-daily-req').innerText = `하루 ${minutesToHoursStr(avgDailyReqMinutes)}`;
 
             document.getElementById('sim-days').innerText = remainingWorkDays;
             
             if (simDiffMinutes >= 0) {
                 document.getElementById('sim-result').innerText = minutesToHoursStr(simDiffMinutes);
-                document.getElementById('sim-status').innerText = "초과";
-                document.getElementById('sim-result').className = "text-2xl text-blue-600 font-extrabold";
-                document.getElementById('sim-status').className = "text-base text-blue-600 font-bold";
-                document.getElementById('user-tip').innerText = `💡 여유 있습니다! 남은 ${remainingWorkDays}일 정시퇴근 해도 ${minutesToHoursStr(simDiffMinutes)} 남습니다.`;
+                document.getElementById('sim-status').innerText = "남게";
+                document.getElementById('sim-result').className = "font-bold text-blue-600";
+                document.getElementById('user-tip').innerText = `💡 팁: 이미 목표 시간을 여유롭게 충족하고 계십니다! 남은 ${remainingWorkDays}일 동안은 매일 추가 연장 없이 8시간씩만 근무하셔도 최종적으로 ${minutesToHoursStr(simDiffMinutes)}이 남습니다. 편안한 마음으로 퇴근하세요!`;
             } else {
                 let absDiff = Math.abs(simDiffMinutes);
                 document.getElementById('sim-result').innerText = minutesToHoursStr(absDiff);
-                document.getElementById('sim-status').innerText = "부족";
-                document.getElementById('sim-result').className = "text-2xl text-red-600 font-extrabold";
-                document.getElementById('sim-status').className = "text-base text-red-600 font-bold";
+                document.getElementById('sim-status').innerText = "부족하";
+                document.getElementById('sim-result').className = "font-bold text-red-600";
+                
                 let extraMinutesPerDay = remainingWorkDays > 0 ? Math.ceil(absDiff / remainingWorkDays) : 0;
-                document.getElementById('user-tip').innerText = `💡 남은 ${remainingWorkDays}일 동안 매일 [ ${extraMinutesPerDay}분 ] 씩만 추가 근무하세요!`;
+                document.getElementById('user-tip').innerText = `💡 팁: 남은 소정근무일수(${remainingWorkDays}일) 동안 하루에 딱 [ ${extraMinutesPerDay}분 ]씩만 더(연장) 근무하시면 목표 시간을 완벽하게 채우실 수 있습니다!`;
             }
 
             document.getElementById('result-container').classList.remove('hidden');
@@ -320,7 +322,7 @@
         function minutesToHoursStr(totalMinutes) {
             const h = Math.floor(totalMinutes / 60);
             const m = totalMinutes % 60;
-            return `${h}h ${String(m).padStart(2, '0')}m`;
+            return `${h}시간 ${String(m).padStart(2, '0')}분`;
         }
     </script>
 </body>
