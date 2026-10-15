@@ -7,9 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; }
-        /* input number 스피너 제거 (예비용) */
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen py-10 px-4">
@@ -17,127 +14,131 @@
     <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
         <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-8 text-white text-center">
             <h1 class="text-2xl font-bold mb-2">📊 스마트 근무시간 계산기</h1>
-            <p class="text-blue-100 text-sm">그룹웨어 특유의 미퇴근 포맷 파싱 및 휴가/반차 반영 계산</p>
+            <p class="text-blue-100 text-sm">그룹웨어 특유의 미퇴근 포맷 파싱 및 월 자동 감지 계산</p>
         </div>
 
-        <div class="p-6 space-y-5">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-100 p-4 rounded-xl border border-gray-200">
+        <div class="p-6 space-y-4">
+            <!-- 공휴일 및 퇴근 가정 시간 설정 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-gray-100 p-4 rounded-xl border border-gray-200">
                 <div>
-                    <label class="block text-gray-700 font-semibold text-sm mb-1" for="custom-holidays">🏢 회사 지정 공휴일 설정</label>
-                    <p class="text-xs text-gray-500 mb-1.5">창립기념일 등 소정근무 제외 날짜 (쉼표 구분)</p>
-                    <input type="text" id="custom-holidays" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                    <label class="block text-gray-700 font-semibold text-xs mb-1" for="custom-holidays">🏢 회사 지정 공휴일</label>
+                    <input type="text" id="custom-holidays" class="w-full p-2 bg-white border border-gray-300 rounded-lg text-xs placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                            placeholder="예: 5/1, 5/22">
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-semibold text-sm mb-1" for="assumed-exit-time">⏰ 오늘 퇴근 가정 시간</label>
-                    <p class="text-xs text-gray-500 mb-1.5">미퇴근 기록(오늘)에 적용할 퇴근 시간</p>
-                    <input type="text" id="assumed-exit-time" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                    <label class="block text-gray-700 font-semibold text-xs mb-1" for="assumed-exit-time">⏰ 오늘 퇴근 가정 시간</label>
+                    <input type="text" id="assumed-exit-time" class="w-full p-2 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                            value="18:30" placeholder="예: 18:30">
                 </div>
             </div>
 
-            <!-- 🔥 +, - 버튼이 추가된 휴가/반차 입력 섹션 -->
-            <div class="bg-orange-50 p-5 rounded-xl border border-orange-200">
-                <h3 class="text-orange-900 font-bold mb-4 flex items-center gap-2">
-                    <span>🏖️</span> 이번 달 휴가 사용 내역 (인정 시간 자동 합산)
-                </h3>
-                <div class="grid grid-cols-3 gap-4">
-                    <!-- 연차 -->
-                    <div class="flex flex-col items-center">
-                        <label class="block text-orange-800 text-sm font-semibold mb-2">연차 (8h)</label>
-                        <div class="flex items-center border border-orange-300 rounded-lg bg-white overflow-hidden shadow-sm">
-                            <button type="button" onclick="adjustCount('count-full', -1)" class="w-10 h-10 bg-orange-100 text-orange-700 hover:bg-orange-200 font-bold text-lg border-r border-orange-200 transition-colors">-</button>
-                            <input type="text" id="count-full" value="0" readonly class="w-12 h-10 text-center outline-none bg-transparent font-bold text-gray-800">
-                            <button type="button" onclick="adjustCount('count-full', 1)" class="w-10 h-10 bg-orange-100 text-orange-700 hover:bg-orange-200 font-bold text-lg border-l border-orange-200 transition-colors">+</button>
+            <!-- 🏖️ 컴팩트형 휴가 인정 입력 바 (한 줄 슬림 디자인) -->
+            <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs">
+                <span class="font-medium text-slate-700 flex items-center gap-1">
+                    <span>🏖️</span> 휴가 인정 추가
+                </span>
+                
+                <div class="flex items-center gap-3">
+                    <!-- 반차 (4시간) -->
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-slate-600">반차(4h)</span>
+                        <div class="inline-flex items-center border border-slate-300 rounded-md bg-white overflow-hidden shadow-sm h-7">
+                            <button type="button" onclick="adjustCount('count-half', -1)" class="w-6 h-full text-slate-500 hover:bg-slate-100 font-bold active:bg-slate-200">-</button>
+                            <input type="number" id="count-half" min="0" value="0" class="w-8 text-center text-xs border-x border-slate-200 focus:outline-none font-semibold">
+                            <button type="button" onclick="adjustCount('count-half', 1)" class="w-6 h-full text-slate-500 hover:bg-slate-100 font-bold active:bg-slate-200">+</button>
                         </div>
                     </div>
-                    <!-- 반차 -->
-                    <div class="flex flex-col items-center">
-                        <label class="block text-orange-800 text-sm font-semibold mb-2">반차 (4h)</label>
-                        <div class="flex items-center border border-orange-300 rounded-lg bg-white overflow-hidden shadow-sm">
-                            <button type="button" onclick="adjustCount('count-half', -1)" class="w-10 h-10 bg-orange-100 text-orange-700 hover:bg-orange-200 font-bold text-lg border-r border-orange-200 transition-colors">-</button>
-                            <input type="text" id="count-half" value="0" readonly class="w-12 h-10 text-center outline-none bg-transparent font-bold text-gray-800">
-                            <button type="button" onclick="adjustCount('count-half', 1)" class="w-10 h-10 bg-orange-100 text-orange-700 hover:bg-orange-200 font-bold text-lg border-l border-orange-200 transition-colors">+</button>
+
+                    <!-- 반반차 (2시간) -->
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-slate-600">반반차(2h)</span>
+                        <div class="inline-flex items-center border border-slate-300 rounded-md bg-white overflow-hidden shadow-sm h-7">
+                            <button type="button" onclick="adjustCount('count-quarter', -1)" class="w-6 h-full text-slate-500 hover:bg-slate-100 font-bold active:bg-slate-200">-</button>
+                            <input type="number" id="count-quarter" min="0" value="0" class="w-8 text-center text-xs border-x border-slate-200 focus:outline-none font-semibold">
+                            <button type="button" onclick="adjustCount('count-quarter', 1)" class="w-6 h-full text-slate-500 hover:bg-slate-100 font-bold active:bg-slate-200">+</button>
                         </div>
                     </div>
-                    <!-- 반반차 -->
-                    <div class="flex flex-col items-center">
-                        <label class="block text-orange-800 text-sm font-semibold mb-2">반반차 (2h)</label>
-                        <div class="flex items-center border border-orange-300 rounded-lg bg-white overflow-hidden shadow-sm">
-                            <button type="button" onclick="adjustCount('count-quarter', -1)" class="w-10 h-10 bg-orange-100 text-orange-700 hover:bg-orange-200 font-bold text-lg border-r border-orange-200 transition-colors">-</button>
-                            <input type="text" id="count-quarter" value="0" readonly class="w-12 h-10 text-center outline-none bg-transparent font-bold text-gray-800">
-                            <button type="button" onclick="adjustCount('count-quarter', 1)" class="w-10 h-10 bg-orange-100 text-orange-700 hover:bg-orange-200 font-bold text-lg border-l border-orange-200 transition-colors">+</button>
+
+                    <!-- 연차 (8시간) -->
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-slate-600">연차(8h)</span>
+                        <div class="inline-flex items-center border border-slate-300 rounded-md bg-white overflow-hidden shadow-sm h-7">
+                            <button type="button" onclick="adjustCount('count-full', -1)" class="w-6 h-full text-slate-500 hover:bg-slate-100 font-bold active:bg-slate-200">-</button>
+                            <input type="number" id="count-full" min="0" value="0" class="w-8 text-center text-xs border-x border-slate-200 focus:outline-none font-semibold">
+                            <button type="button" onclick="adjustCount('count-full', 1)" class="w-6 h-full text-slate-500 hover:bg-slate-100 font-bold active:bg-slate-200">+</button>
                         </div>
                     </div>
                 </div>
-                <p class="text-[13px] text-orange-700 mt-4 text-center bg-orange-100/50 p-2 rounded-lg">
-                    💡 <strong>+, - 버튼</strong>을 눌러 개수를 맞추면, 해당 시간만큼 총 누적 근무시간에 자동 합산됩니다.
-                </p>
             </div>
 
+            <!-- 데이터 입력 영역 -->
             <div>
-                <label class="block text-gray-700 font-semibold mb-2" for="raw-data">📅 근무 기록 데이터 붙여넣기</label>
-                <textarea id="raw-data" class="w-full h-48 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm font-mono placeholder-gray-400" 
-                          placeholder="근무 데이터를 그대로 복사 붙여넣기 하세요. (여러 달의 데이터가 섞여 있어도 메인 달을 자동 인식합니다.)"></textarea>
+                <label class="block text-gray-700 font-semibold mb-1.5 text-sm" for="raw-data">📅 근무 기록 데이터 붙여넣기</label>
+                <textarea id="raw-data" class="w-full h-44 p-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-xs font-mono placeholder-gray-400" 
+                          placeholder="근무 데이터를 그대로 붙여넣으세요. 다른 월의 데이터가 함께 들어와도 가장 많은 월을 자동으로 판별하여 계산합니다."></textarea>
             </div>
 
-            <button onclick="calculateWorkingHours()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-lg transition duration-200 cursor-pointer shadow-md text-lg tracking-wide">
+            <button type="button" onclick="calculateWorkingHours()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-lg transition duration-200 cursor-pointer shadow-md">
                 📊 계산하기
             </button>
 
-            <div id="result-container" class="hidden space-y-6 border-t border-gray-100 pt-6 animate-fade-in">
+            <!-- 결과 컨테이너 -->
+            <div id="result-container" class="hidden space-y-5 border-t border-gray-100 pt-5">
 
-                <!-- 🎯 핵심 결과 시뮬레이션 카드 -->
-                <div class="bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100/60 border-2 border-orange-300 p-5 rounded-2xl shadow-md space-y-4">
-                    <div class="flex items-center justify-between border-b border-orange-200/80 pb-2.5">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xl">🎯</span>
-                            <h3 class="font-extrabold text-orange-950 text-base">최종 예상 결과 (하루 8시간 근무 시)</h3>
+                <!-- 🎯 최종 시뮬레이션 카드 -->
+                <div class="bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100/60 border-2 border-orange-300 p-4 rounded-2xl shadow-sm space-y-3">
+                    <div class="flex items-center justify-between border-b border-orange-200/80 pb-2">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-lg">🎯</span>
+                            <h3 class="font-extrabold text-orange-950 text-sm">최종 예상 결과 (남은 평일 8시간 근무 시)</h3>
                         </div>
-                        <span class="text-[11px] font-bold px-2.5 py-1 bg-orange-200/70 text-orange-800 rounded-full">시뮬레이션</span>
+                        <span class="text-[11px] font-bold px-2 py-0.5 bg-orange-200/70 text-orange-800 rounded-full">시뮬레이션</span>
                     </div>
                     
-                    <div class="bg-white/90 backdrop-blur p-4 rounded-xl border border-orange-200 shadow-inner text-center">
+                    <div class="bg-white/90 backdrop-blur p-3.5 rounded-xl border border-orange-200 text-center">
                         <p class="text-xs text-gray-500 font-medium mb-1">
                             남은 <span id="sim-days" class="font-bold text-gray-800">0</span>일 동안 추가 연장 없이 8시간씩 일하면?
                         </p>
-                        <div class="text-2xl font-black text-gray-900 flex items-center justify-center gap-1.5 my-1">
-                            <span id="sim-result" class="text-3xl text-red-600 font-extrabold">0시간 00분</span>
-                            <span id="sim-status" class="text-xl text-red-600 font-bold">부족</span>
+                        <div class="text-2xl font-black text-gray-900 flex items-center justify-center gap-1.5 my-0.5">
+                            <span id="sim-result" class="text-2xl text-red-600 font-extrabold">0시간 00분</span>
+                            <span id="sim-status" class="text-lg text-red-600 font-bold">부족</span>
                         </div>
                     </div>
                     
-                    <div class="text-xs text-orange-800 bg-white/70 p-2.5 rounded-lg border border-orange-200/60 flex items-center gap-2" id="user-tip">
+                    <div class="text-xs text-orange-800 bg-white/70 p-2.5 rounded-lg border border-orange-200/60 flex items-center gap-1.5" id="user-tip">
                         <span>💡</span>
                         <span>팁: 남은 기간 동안 파이팅입니다!</span>
                     </div>
                 </div>
                 
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                    <h3 class="font-bold text-blue-900 mb-2" id="title-month">📊 [XXXX년 XX월 근무 스케줄]</h3>
-                    <ul class="text-sm text-blue-800 space-y-1">
-                        <li>• 소정근무일수: <span id="total-work-days" class="font-bold">0</span>일 </li>
+                <!-- 월 기준 스케줄 -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-3.5 rounded-r-lg">
+                    <h3 class="font-bold text-blue-900 text-sm mb-1.5" id="title-month">📊 [XXXX년 XX월 근무 스케줄]</h3>
+                    <ul class="text-xs text-blue-800 space-y-1">
+                        <li>• 소정근무일수: <span id="total-work-days" class="font-bold">0</span>일</li>
                         <li>• 소정근무시간: <span id="total-work-hours" class="font-bold">0</span>시간 00분</li>
                     </ul>
                 </div>
 
-                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg">
-                    <h3 class="font-bold text-purple-900 mb-2">⏳ [남은 기간 근무 가이드]</h3>
-                    <ul class="text-sm text-purple-800 space-y-1">
-                        <li>• 남은 소정근무일수: <span id="rem-days" class="font-bold">0</span>일 (오늘 이후 주말/공휴일 제외 평일)</li>
-                        <li>• 목표 달성을 위해 남은 총 시간: <span id="rem-hours" class="font-bold text-purple-700">0시간 00분</span></li>
-                        <li>• 남은 일수 동안의 하루 평균 필수 근무 시간: <span id="avg-daily-req" class="font-bold text-purple-900">하루 0시간 00분</span></li>
+                <!-- 남은 가이드 -->
+                <div class="bg-purple-50 border-l-4 border-purple-500 p-3.5 rounded-r-lg">
+                    <h3 class="font-bold text-purple-900 text-sm mb-1.5">⏳ [남은 기간 근무 가이드]</h3>
+                    <ul class="text-xs text-purple-800 space-y-1">
+                        <li>• 남은 소정근무일수: <span id="rem-days" class="font-bold">0</span>일 (오늘 이후 주말/공휴일 제외)</li>
+                        <li>• 목표 달성을 위한 잔여 시간: <span id="rem-hours" class="font-bold text-purple-700">0시간 00분</span></li>
+                        <li>• 하루 평균 필수 근무 시간: <span id="avg-daily-req" class="font-bold text-purple-900">하루 0시간 00분</span></li>
                     </ul>
                 </div>
 
-                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
-                    <h3 class="font-bold text-green-900 mb-2">✅ [현재까지의 누적 근무 현황]</h3>
-                    <ul class="text-sm text-green-800 space-y-1">
+                <!-- 누적 현황 -->
+                <div class="bg-green-50 border-l-4 border-green-500 p-3.5 rounded-r-lg">
+                    <h3 class="font-bold text-green-900 text-sm mb-1.5">✅ [현재까지의 누적 근무 현황]</h3>
+                    <ul class="text-xs text-green-800 space-y-1">
                         <li>• 실제 출퇴근 누적 시간: <span id="actual-hours" class="font-bold">0시간 00분</span></li>
-                        <li>• 휴가 인정 추가 시간 (입력한 개수 합산): <span id="vacation-hours" class="font-bold text-orange-600">0시간 00분</span></li>
-                        <li class="mt-2 text-[15px] font-semibold text-green-900 bg-green-100/50 p-2 rounded flex items-center justify-between">
-                            <span>🔥 최종 누적 시간: <span id="final-hours" class="font-bold text-blue-600 text-lg">0시간 00분</span></span>
-                            <span id="final-hours-note" class="text-xs font-normal text-gray-500">(오늘 18:30 퇴근 가정 포함)</span>
+                        <li>• 휴가 인정 추가 시간: <span id="vacation-hours" class="font-bold text-orange-600">0시간 00분</span></li>
+                        <li class="mt-1 text-sm font-semibold text-green-900">
+                            • 🔥 최종 누적 시간: <span id="final-hours" class="font-bold text-blue-600">0시간 00분</span> 
+                            <span id="final-hours-note" class="text-xs font-normal text-gray-500">(오늘 퇴근 가정 포함)</span>
                         </li>
                     </ul>
                 </div>
@@ -153,15 +154,13 @@
             "2026-09-25", "2026-09-26", "2026-10-03", "2026-10-05", "2026-10-09", "2026-12-25"
         ];
 
-        // 🟢 플러스 마이너스 버튼 제어 함수
+        // +/- 버튼 클릭 시 숫자 증감 함수
         function adjustCount(elementId, delta) {
             const input = document.getElementById(elementId);
-            let currentValue = parseInt(input.value) || 0;
-            let newValue = currentValue + delta;
-            
-            // 0 이하로 내려가지 않도록 방지
-            if (newValue < 0) newValue = 0;
-            input.value = newValue;
+            if (!input) return;
+            let current = parseInt(input.value, 10) || 0;
+            current = Math.max(0, current + delta);
+            input.value = current;
         }
 
         function calculateWorkingHours() {
@@ -172,3 +171,199 @@
             }
 
             let assumedExitTime = document.getElementById('assumed-exit-time').value.trim();
+            if (!/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(assumedExitTime)) {
+                alert("퇴근 가정 시간 형식이 올바르지 않습니다. (예: 18:30)");
+                return;
+            }
+
+            // 휴가 개수 읽기 및 시간(분) 환산
+            const countFull = parseInt(document.getElementById('count-full').value, 10) || 0;
+            const countHalf = parseInt(document.getElementById('count-half').value, 10) || 0;
+            const countQuarter = parseInt(document.getElementById('count-quarter').value, 10) || 0;
+            const manualVacationMinutes = (countFull * 8 * 60) + (countHalf * 4 * 60) + (countQuarter * 2 * 60);
+
+            const lines = rawText.split('\n');
+            let parsedRecords = [];
+
+            // 연도 감지 (텍스트에 202X 없으면 2026 기본값)
+            const textYearMatch = rawText.match(/202\d/);
+            let detectedYear = textYearMatch ? parseInt(textYearMatch[0], 10) : 2026;
+
+            // 데이터 줄별 파싱
+            lines.forEach((line) => {
+                if (!line.trim()) return;
+                
+                const dateMatch = line.match(/(\d{1,2})[-/.](\d{1,2})/); 
+                const timeMatches = line.match(/(\d{2}:\d{2})/g); 
+
+                if (dateMatch) {
+                    let m = parseInt(dateMatch[1], 10);
+                    let d = parseInt(dateMatch[2], 10);
+                    let clockIn = null;
+                    let clockOut = null;
+
+                    if (timeMatches) {
+                        if (timeMatches.length >= 4) {
+                            clockIn = timeMatches[0];
+                            clockOut = timeMatches[1];
+                        } else if (timeMatches.length === 3) {
+                            clockIn = timeMatches[0];
+                            clockOut = assumedExitTime; 
+                        } else if (timeMatches.length === 2) {
+                            clockIn = timeMatches[0];
+                            clockOut = timeMatches[1];
+                        } else if (timeMatches.length === 1) {
+                            clockIn = timeMatches[0];
+                            clockOut = assumedExitTime;
+                        }
+                    }
+
+                    parsedRecords.push({
+                        dateStr: `${detectedYear}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,
+                        month: m,
+                        day: d,
+                        clockIn,
+                        clockOut
+                    });
+                }
+            });
+
+            if (parsedRecords.length === 0) {
+                alert("유효한 날짜 포맷을 찾을 수 없습니다.");
+                return;
+            }
+
+            // 다중 월 데이터 감지: 가장 많이 등장한 월을 타겟 월로 선정
+            let monthCounts = {};
+            parsedRecords.forEach(r => {
+                monthCounts[r.month] = (monthCounts[r.month] || 0) + 1;
+            });
+            let detectedMonth = parseInt(Object.keys(monthCounts).reduce((a, b) => monthCounts[a] > monthCounts[b] ? a : b), 10);
+
+            // 해당 타겟 월 데이터만 필터링
+            parsedRecords = parsedRecords.filter(r => r.month === detectedMonth);
+
+            // 공휴일 파싱
+            const customInput = document.getElementById('custom-holidays').value.trim();
+            let customHolidays = [];
+            if (customInput) {
+                customInput.split(',').forEach(item => {
+                    const match = item.trim().match(/(\d{1,2})[-/.](\d{1,2})/);
+                    if (match) {
+                        let cm = String(match[1]).padStart(2, '0');
+                        let cd = String(match[2]).padStart(2, '0');
+                        customHolidays.push(`${detectedYear}-${cm}-${cd}`);
+                    }
+                });
+            }
+            const activeHolidays = [...HOLIDAYS_2026, ...customHolidays];
+
+            // 타겟 월의 평일 수(소정근로일수) 계산
+            let totalRequiredDays = 0;
+            let totalDaysInMonth = new Date(detectedYear, detectedMonth, 0).getDate();
+            
+            for (let d = 1; d <= totalDaysInMonth; d++) {
+                let dateObj = new Date(detectedYear, detectedMonth - 1, d);
+                let dateStr = `${detectedYear}-${String(detectedMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                let dayOfWeek = dateObj.getDay(); 
+                
+                if (dayOfWeek !== 0 && dayOfWeek !== 6 && !activeHolidays.includes(dateStr)) {
+                    totalRequiredDays++;
+                }
+            }
+            let totalRequiredMinutes = totalRequiredDays * 8 * 60;
+
+            // 실근무시간 및 점심/저녁 휴게시간 공제
+            let totalActualMinutes = 0;
+            parsedRecords.forEach(r => {
+                if (!r.clockIn || !r.clockOut) return;
+
+                let inMin = timeToMinutes(r.clockIn);
+                let outMin = timeToMinutes(r.clockOut);
+                if (outMin <= inMin) return; 
+
+                let netMinutes = outMin - inMin;
+
+                // 점심시간 제외 (12:30 ~ 13:30)
+                let lunchOverlap = Math.max(0, Math.min(outMin, 13 * 60 + 30) - Math.max(inMin, 12 * 60 + 30));
+                netMinutes -= lunchOverlap;
+
+                // 저녁시간 제외 (18:30 ~ 19:30)
+                let dinnerOverlap = Math.max(0, Math.min(outMin, 19 * 60 + 30) - Math.max(inMin, 18 * 60 + 30));
+                netMinutes -= dinnerOverlap;
+
+                totalActualMinutes += netMinutes;
+            });
+
+            // 지난 평일 수 계산
+            let uniqueDatesInRecord = [...new Set(parsedRecords.map(r => r.dateStr))];
+            let validRecordedDaysCount = uniqueDatesInRecord.filter(dStr => {
+                const parts = dStr.split('-').map(Number);
+                let dObj = new Date(parts[0], parts[1] - 1, parts[2]);
+                let dw = dObj.getDay();
+                return dw !== 0 && dw !== 6 && !activeHolidays.includes(dStr);
+            }).length;
+
+            let leaveDaysCount = countFull + (countHalf * 0.5) + (countQuarter * 0.25);
+            let passedWorkDaysCount = validRecordedDaysCount + leaveDaysCount;
+            let remainingWorkDays = Math.max(0, Math.ceil(totalRequiredDays - passedWorkDaysCount));
+
+            let finalAcceptedMinutes = totalActualMinutes + manualVacationMinutes;
+            let remainingMinutes = Math.max(0, totalRequiredMinutes - finalAcceptedMinutes);
+            let avgDailyReqMinutes = remainingWorkDays > 0 ? Math.ceil(remainingMinutes / remainingWorkDays) : 0;
+
+            // 시뮬레이션: 남은 일수를 8시간씩 근무할 경우
+            let simFutureMinutes = remainingWorkDays * 8 * 60;
+            let simFinalTotalMinutes = finalAcceptedMinutes + simFutureMinutes; 
+            let simDiffMinutes = simFinalTotalMinutes - totalRequiredMinutes;
+
+            // UI 렌더링
+            document.getElementById('title-month').innerText = `📊 [${detectedYear}년 ${detectedMonth}월 근무 스케줄]`;
+            document.getElementById('total-work-days').innerText = totalRequiredDays;
+            document.getElementById('total-work-hours').innerText = totalRequiredDays * 8;
+
+            document.getElementById('actual-hours').innerText = minutesToHoursStr(totalActualMinutes);
+            document.getElementById('vacation-hours').innerText = minutesToHoursStr(manualVacationMinutes);
+            document.getElementById('final-hours').innerText = minutesToHoursStr(finalAcceptedMinutes);
+            document.getElementById('final-hours-note').innerText = `(오늘 ${assumedExitTime} 퇴근 가정 포함)`;
+
+            document.getElementById('rem-days').innerText = remainingWorkDays;
+            document.getElementById('rem-hours').innerText = minutesToHoursStr(remainingMinutes);
+            document.getElementById('avg-daily-req').innerText = `하루 ${minutesToHoursStr(avgDailyReqMinutes)}`;
+
+            document.getElementById('sim-days').innerText = remainingWorkDays;
+            
+            if (simDiffMinutes >= 0) {
+                document.getElementById('sim-result').innerText = minutesToHoursStr(simDiffMinutes);
+                document.getElementById('sim-status').innerText = "초과";
+                document.getElementById('sim-result').className = "text-2xl text-blue-600 font-extrabold";
+                document.getElementById('sim-status').className = "text-lg text-blue-600 font-bold";
+
+                document.getElementById('user-tip').innerText = `💡 팁: 남은 ${remainingWorkDays}일 동안 하루 8시간 정시 퇴근해도 최종 ${minutesToHoursStr(simDiffMinutes)} 여유가 있습니다.`;
+            } else {
+                let absDiff = Math.abs(simDiffMinutes);
+                document.getElementById('sim-result').innerText = minutesToHoursStr(absDiff);
+                document.getElementById('sim-status').innerText = "부족";
+                document.getElementById('sim-result').className = "text-2xl text-red-600 font-extrabold";
+                document.getElementById('sim-status').className = "text-lg text-red-600 font-bold";
+                
+                let extraMinutesPerDay = remainingWorkDays > 0 ? Math.ceil(absDiff / remainingWorkDays) : 0;
+                document.getElementById('user-tip').innerText = `💡 팁: 남은 소정근무일수(${remainingWorkDays}일) 동안 하루 약 ${extraMinutesPerDay}분씩 추가 근무하면 기준 시간을 충족합니다.`;
+            }
+
+            document.getElementById('result-container').classList.remove('hidden');
+        }
+
+        function timeToMinutes(timeStr) {
+            const [h, m] = timeStr.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        function minutesToHoursStr(totalMinutes) {
+            const h = Math.floor(totalMinutes / 60);
+            const m = totalMinutes % 60;
+            return `${h}시간 ${String(m).padStart(2, '0')}분`;
+        }
+    </script>
+</body>
+</html>
